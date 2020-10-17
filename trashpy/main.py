@@ -76,7 +76,7 @@ def main():
           request = service.files().get_media(fileId=file['id'])
 
         except:
-          print('Skipping:', filepath)
+          print('Skipping, Not Downloadable:', filepath)
           continue
 
     else:
