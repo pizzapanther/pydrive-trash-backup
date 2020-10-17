@@ -1,2 +1,2 @@
 include trashpy/*.json
-
+include README.md

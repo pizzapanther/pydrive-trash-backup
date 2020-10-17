@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="trashpy",
-    version="1.0.1",
+    version="1.0.2",
     author="Paul Bailey",
     author_email="paul.m.bailey@gmail.com",
     description="Download your Google Drive Trash folder",
