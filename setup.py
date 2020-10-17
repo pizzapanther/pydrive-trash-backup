@@ -17,4 +17,9 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=['google-api-python-client', 'google-auth-oauthlib'],
+    entry_points={
+        'console_scripts': [
+            'trashpy = trashpy.main:main',
+        ],
+    }
 )
