@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 
 gtrash
+client_id.json
