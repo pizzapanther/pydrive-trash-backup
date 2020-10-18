@@ -6,18 +6,17 @@ from googleapiclient.http import MediaIoBaseDownload
 
 def download(service, file):
   filepath = file['path']
-
   if file['mimeType'].endswith('.folder'):
     return
 
   elif file['mimeType'].startswith('application/vnd.google-apps'):
     doc = file['mimeType'].split('.')[-1]
-    if doc in ['spreadsheet', 'doc', 'presentation', 'drawing']:
+    if doc in ['spreadsheet', 'doc', 'document', 'presentation', 'drawing']:
       if doc == 'spreadsheet':
         mtype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ext = 'xlsx'
 
-      elif doc == 'doc':
+      elif doc == 'document' or doc == 'doc':
         mtype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ext = 'docx'
 

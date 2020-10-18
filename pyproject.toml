@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trashpy"
-version = "1.0.5"
+version = "1.0.6"
 description = "Download your Google Drive Trash folder"
 authors = ["Paul Bailey <paul.m.bailey@gmail.com>"]
 license = "MIT"
