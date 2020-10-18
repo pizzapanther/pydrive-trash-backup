@@ -4,6 +4,59 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
+def download(service, file):
+  filepath = file['path']
+
+  if file['mimeType'].endswith('.folder'):
+    return
+
+  elif file['mimeType'].startswith('application/vnd.google-apps'):
+    doc = file['mimeType'].split('.')[-1]
+    if doc in ['spreadsheet', 'doc', 'presentation', 'drawing']:
+      if doc == 'spreadsheet':
+        mtype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ext = 'xlsx'
+
+      elif doc == 'doc':
+        mtype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ext = 'docx'
+
+      elif doc == 'presentation':
+        mtype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+        ext = 'pptx'
+
+      elif doc == 'drawing':
+        mtype = 'image/svg+xml'
+        ext = 'svg'
+
+      filepath += '.' + ext
+      request = service.files().export_media(fileId=file['id'], mimeType=mtype)
+
+    else:
+      try:
+        request = service.files().get_media(fileId=file['id'])
+
+      except:
+        print('Skipping, Not Downloadable:', filepath)
+        return
+
+  else:
+    request = service.files().get_media(fileId=file['id'])
+
+  print("{}  ".format(filepath), end="")
+  d = os.path.dirname(filepath)
+  if not os.path.exists(d):
+    os.makedirs(d)
+
+  with open(filepath, 'wb') as fh:
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while done is False:
+      status, done = downloader.next_chunk()
+      print(".", end="")
+
+    print("")
+
 def main():
   client_json = os.path.join(os.path.dirname(__file__), 'client_id.json')
   flow = InstalledAppFlow.from_client_secrets_file(
@@ -44,59 +97,11 @@ def main():
         break
 
   for file in trashed:
-    filepath = file['path']
+    try:
+      download(service, file)
 
-    if file['mimeType'].endswith('.folder'):
-      continue
-
-    elif file['mimeType'].startswith('application/vnd.google-apps'):
-      doc = file['mimeType'].split('.')[-1]
-      if doc in ['spreadsheet', 'doc', 'presentation', 'drawing']:
-        if doc == 'spreadsheet':
-          mtype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          ext = 'xlsx'
-
-        elif doc == 'doc':
-          mtype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-          ext = 'docx'
-
-        elif doc == 'presentation':
-          mtype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-          ext = 'pptx'
-
-        elif doc == 'drawing':
-          mtype = 'image/svg+xml'
-          ext = 'svg'
-
-        filepath += '.' + ext
-        request = service.files().export_media(fileId=file['id'], mimeType=mtype)
-
-      else:
-        try:
-          request = service.files().get_media(fileId=file['id'])
-
-        except:
-          print('Skipping, Not Downloadable:', filepath)
-          continue
-
-    else:
-      request = service.files().get_media(fileId=file['id'])
-
-    print("{}  ".format(filepath), end="")
-    d = os.path.dirname(filepath)
-    if not os.path.exists(d):
-      os.makedirs(d)
-
-    with open(filepath, 'wb') as fh:
-      downloader = MediaIoBaseDownload(fh, request)
-      done = False
-      while done is False:
-        status, done = downloader.next_chunk()
-        print(".", end="")
-
-      print("")
-
-
+    except:
+      print('Error Downloading:', file['path'])
 
 if __name__ == "__main__":
   main()
